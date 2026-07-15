@@ -1,0 +1,10 @@
+{
+  "ShardId": "B",
+  "DisplayName": "Industrial",
+  "Port": 27017,
+  "QueryPort": 27018,
+  "BackendUrl": "http://localhost:8443",
+  "Secret": "fb1976e069994f08a3f0725eb5ba9051ecd5159ab74cce1f2cdf6cad56bfa45d",
+  "Capacity": 2,
+  "Peers": [ "A", "C" ]
+}

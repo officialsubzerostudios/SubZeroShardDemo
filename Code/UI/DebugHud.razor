@@ -1,0 +1,101 @@
+@using System
+@using System.Linq
+@using Sandbox
+@using Sandbox.UI
+@using SubZeroShardDemo
+@inherits PanelComponent
+
+@*
+    Debug HUD. Attach to a GameObject that also has a ScreenPanel component. Shows the current
+    shard (big banner), money, carried item, flags, backend status, and the latest denial.
+    Reads synced state, so it works on the client viewing whichever shard it's connected to.
+*@
+
+<root style="width:100%; height:100%;">
+
+    <div style="position:absolute; top:0; left:0; width:100%; height:64px;
+                justify-content:center; align-items:center;
+                background-color:@BannerColor; color:white; font-size:34px; font-weight:bold;">
+        @($"SHARD {ShardId} - {DisplayName}")
+    </div>
+
+    <div style="position:absolute; top:80px; left:20px; flex-direction:column;
+                background-color:rgba(0,0,0,0.65); padding:14px; min-width:260px;
+                color:white; font-size:18px;">
+        <div style="flex-direction:row; justify-content:space-between;">
+            <label>Money</label><label style="color:#7CFC7C;">$@Money</label>
+        </div>
+        <div style="flex-direction:row; justify-content:space-between;">
+            <label>Item</label><label>@ItemText</label>
+        </div>
+        <div style="flex-direction:row; justify-content:space-between;">
+            <label>Handcuffed</label><label style="color:@(Cuffed ? "#ff8080" : "#aaaaaa");">@(Cuffed ? "YES" : "no")</label>
+        </div>
+        <div style="flex-direction:row; justify-content:space-between;">
+            <label>Combat</label><label style="color:@(InCombat ? "#ff8080" : "#aaaaaa");">@CombatText</label>
+        </div>
+        <div style="flex-direction:row; justify-content:space-between;">
+            <label>Backend</label><label style="color:@(BackendOk ? "#7CFC7C" : "#ff5050");">@(BackendOk ? "connected" : "UNREACHABLE")</label>
+        </div>
+    </div>
+
+    @if ( ShowDenial )
+    {
+        <div style="position:absolute; top:45%; left:0; width:100%; justify-content:center;">
+            <label style="background-color:rgba(150,0,0,0.85); color:white; padding:12px 20px;
+                          font-size:22px; font-weight:bold;">TRANSFER DENIED - @Denial</label>
+        </div>
+    }
+
+    @if ( !string.IsNullOrEmpty( LookPrompt ) )
+    {
+        <div style="position:absolute; bottom:90px; left:0; width:100%; justify-content:center;">
+            <label style="background-color:rgba(0,0,0,0.8); color:white; padding:12px 22px;
+                          font-size:20px;">@LookPrompt</label>
+        </div>
+    }
+
+</root>
+
+@code {
+	private ShardContext Ctx => ShardContext.Current;
+
+	private PlayerController LocalPlayer =>
+		Game.ActiveScene?.GetAllComponents<PlayerController>().FirstOrDefault( p => !p.GameObject.IsProxy );
+
+	private PlayerWallet Wallet => LocalPlayer?.Components.Get<PlayerWallet>();
+	private PlayerTestState State => LocalPlayer?.Components.Get<PlayerTestState>();
+	private PlayerTransfer Transfer => LocalPlayer?.Components.Get<PlayerTransfer>();
+
+	private string ShardId => Ctx?.ShardId ?? "?";
+	private string DisplayName => (Ctx?.DisplayName ?? "").ToUpper();
+	private bool BackendOk => Ctx?.BackendOk ?? false;
+
+	private int Money => Wallet?.Money ?? 0;
+	private bool Cuffed => State?.Handcuffed ?? false;
+	private string ItemText => string.IsNullOrEmpty( State?.CarriedItem ) ? "(none)" : State!.CarriedItem;
+
+	private bool InCombat => (State?.TimeSinceCombat ?? 9999f) < TransferService.CombatLockSeconds;
+	private string CombatText => InCombat
+		? $"IN COMBAT ({TransferService.CombatLockSeconds - State!.TimeSinceCombat:0.0}s)"
+		: "-";
+
+	private bool ShowDenial => Transfer is not null
+		&& !string.IsNullOrEmpty( Transfer.LastDenial )
+		&& (Time.Now - Transfer.LastDenialAt) < 4f;
+	private string Denial => Transfer?.LastDenial ?? "";
+
+	private string LookPrompt => TransitionButton.LookPrompt ?? "";
+
+	private string BannerColor => ShardId switch
+	{
+		"B" => "#e08a1e",   // Industrial, orange
+		"C" => "#c0392b",   // Jail, red
+		_ => "#2d6cdf",     // Downtown, blue
+	};
+
+	protected override int BuildHash() => HashCode.Combine(
+		ShardId, Money, Cuffed, ItemText, BackendOk,
+		(int)(State?.TimeSinceCombat ?? 9999f), ShowDenial,
+		HashCode.Combine( Denial, LookPrompt ) );
+}

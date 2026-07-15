@@ -1,0 +1,35 @@
+{
+  "Title": "SubZeroShardDemo",
+  "Type": "game",
+  "Org": "subzerostudios",
+  "Ident": "subzerosharddemo",
+  "Schema": 1,
+  "IncludeSourceFiles": false,
+  "Resources": "*.png\n*.ttf\n*.mp3\n*.wav\n*.config\n*.scss\n*.prefab\n*.prefab_c\n*.json\nfonts/*\n/fonts/*\n/ui/*\nstyle/*",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Mounts": [],
+  "IsStandaloneOnly": false,
+  "Metadata": {
+    "MaxPlayers": 8,
+    "MinPlayers": 1,
+    "TickRate": 50,
+    "GameNetworkType": "Multiplayer",
+    "MapSelect": "Local",
+    "MapList": [],
+    "RankType": "None",
+    "PerMapRanking": false,
+    "LeaderboardType": "None",
+    "CsProjName": "",
+    "StartupScene": "scenes/subzerosharddemo.scene",
+    "ProjectTemplate": null,
+    "LaunchMode": "Launcher",
+    "MapStartupScene": "scenes/subzerosharddemo.scene",
+    "DedicatedServerStartupScene": "scenes/subzerosharddemo.scene",
+    "ControlModes": {
+      "Keyboard": true,
+      "VR": false,
+      "Gamepad": true
+    }
+  }
+}

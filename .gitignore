@@ -1,0 +1,31 @@
+# s&box generated / cache
+.sbox/
+/obj/
+/bin/
+*.sln
+*.slnx
+*.csproj.user
+Code/*.csproj
+Code/Properties/
+subzerosharddemo.csproj
+CodeGenOutput/
+Local.sbproj
+
+# backend build output
+backend/bin/
+backend/obj/
+backend/data/
+
+# editor (machine-specific, contains absolute paths)
+.vs/
+.vscode/
+
+# s&box compiled asset artifacts (regenerated on load; commit only the source)
+*_c
+*.scene_d
+
+# working notes (kept local, not published)
+SPIKE.md
+EDITOR_NOTES.md
+TODO.md
+TEST_RESULTS.md
